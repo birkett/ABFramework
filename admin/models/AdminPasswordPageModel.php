@@ -35,7 +35,8 @@
 
 namespace ABFramework\models;
 
-use \ABFramework\models\AdminBasePageModel as AdminBasePageModel;
+use \ABFramework\models\AdminBasePageModel;
+use \ABFramework\traits\PasswordTools;
 
 /**
  * Handles data for the list pages controller.
@@ -51,6 +52,7 @@ use \ABFramework\models\AdminBasePageModel as AdminBasePageModel;
  */
 class AdminPasswordPageModel extends AdminBasePageModel
 {
+    use PasswordTools;
 
 
     /**
@@ -121,46 +123,10 @@ class AdminPasswordPageModel extends AdminBasePageModel
 
         if ($this->database->getNumRows($result) === 1) {
             $dbhash = $this->database->getRow($result);
-
-            // Password_verify is PHP 5.5+, fall back on older versions.
-            if (function_exists('password_verify') === true) {
-                $result = password_verify($password, $dbhash->password);
-                return $result;
-            }
-
-            $newhash = crypt($password, $dbhash->password);
-
-            if ($newhash === $dbhash->password) {
-                return true;
-            }
-
-            return false;
+            $return = $this->verifyPassword($password, $dbhash->password);
+            return $return;
         }//end if
 
         return false;
     }//end checkCredentials()
-
-
-    /**
-     * Generate a new password hash using a random salt.
-     *
-     * @param string $password Plain text password.
-     *
-     * @return string Password hash
-     */
-    public function hashPassword($password)
-    {
-        $options = array('cost' => HASHING_COST);
-        // Password_hash is PHP 5.5+, fall back when not available.
-        if (function_exists('password_hash') === true) {
-            $result = password_hash($password, PASSWORD_BCRYPT, $options);
-            return $result;
-        }
-
-        $salt = base64_encode(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM));
-        $salt = str_replace('+', '.', $salt);
-
-        $result = crypt($password, '$2y$'.$options['cost'].'$'.$salt.'$');
-        return $result;
-    }//end hashPassword()
 }//end class

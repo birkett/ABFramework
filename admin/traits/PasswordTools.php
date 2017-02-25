@@ -25,7 +25,7 @@
  *
  * PHP Version 5.3
  *
- * @category  AdminModels
+ * @category  Traits
  * @package   ABFramework
  * @author    Anthony Birkett <anthony@a-birkett.co.uk>
  * @copyright 2015 Anthony Birkett
@@ -33,53 +33,68 @@
  * @link      http://www.a-birkett.co.uk
  */
 
-namespace ABFramework\models;
-
-use \ABFramework\models\AdminBasePageModel;
-use \ABFramework\traits\PasswordTools;
+namespace ABFramework\traits;
 
 /**
- * Handles data for the login controller.
+ * Password manipulation tools, which can be used in multiple areas.
  *
- * @category  AdminModels
+ * @category  Traits
  * @package   ABFramework
  * @author    Anthony Birkett <anthony@a-birkett.co.uk>
  * @copyright 2015 Anthony Birkett
  * @license   http://opensource.org/licenses/MIT  The MIT License (MIT)
  * @link      http://www.a-birkett.co.uk
  */
-class AdminLoginPageModel extends AdminBasePageModel
+trait PasswordTools
 {
-    use PasswordTools;
 
 
     /**
-     * Check if supplied credentials match the database (login function).
+     * Generate a new password hash using a random salt.
      *
-     * @param string $username Input username.
-     * @param string $password Input password.
+     * @param string $password Plain text password.
      *
-     * @return boolean True when verified, False otherwise
+     * @return string Password hash
      */
-    public function checkCredentials($username, $password)
+    public function hashPassword($password)
     {
-        if ($username === '' || $password === '') {
-            return false;
+        $options = array('cost' => HASHING_COST);
+        // Password_hash is PHP 5.5+, fall back when not available.
+        if (function_exists('password_hash') === true) {
+            $result = password_hash($password, PASSWORD_BCRYPT, $options);
+            return $result;
         }
 
-        $result = $this->database->runQuery(
-            'SELECT password
-             FROM   site_users
-             WHERE  username = :username',
-            array(':username' => $username)
-        );
+        $salt = base64_encode(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM));
+        $salt = str_replace('+', '.', $salt);
 
-        if ($this->database->getNumRows($result) === 1) {
-            $dbhash = $this->database->getRow($result);
-            $return = $this->verifyPassword($password, $dbhash->password);
-            return $return;
-        }//end if
+        $result = crypt($password, '$2y$'.$options['cost'].'$'.$salt.'$');
+        return $result;
+    }//end hashPassword()
+
+
+    /**
+     * Verify a password against a hash.
+     *
+     * @param string $password Plain text password.
+     * @param string $hash     Stored password hash.
+     *
+     * @return boolean True on match, false otherwise.
+     */
+    public function verifyPassword($password, $hash)
+    {
+        // Password_verify is PHP 5.5+, fall back on older versions.
+        if (function_exists('password_verify') === true) {
+            $result = password_verify($password, $hash);
+            return $result;
+        }
+
+        $newhash = crypt($password, $hash);
+
+        if ($newhash === $hash) {
+            return true;
+        }
 
         return false;
-    }//end checkCredentials()
+    }//end verifyPassword()
 }//end class
