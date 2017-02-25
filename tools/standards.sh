@@ -16,4 +16,4 @@ else
 fi
 
 echo "Testing for standard ${standard}"
-phpcs --standard=${standard} ${phpversion} ../admin ../classes ../controllers ../models
+phpcs --standard=${standard} ${phpversion} ../admin ../classes ../controllers ../models ../tests

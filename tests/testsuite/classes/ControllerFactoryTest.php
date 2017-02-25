@@ -25,68 +25,46 @@
  *
  * PHP Version 5.3
  *
- * @category  Classes
- * @package   ABFramework
+ * @category  Tests
+ * @package   PersonalWebsite
  * @author    Anthony Birkett <anthony@a-birkett.co.uk>
  * @copyright 2015 Anthony Birkett
  * @license   http://opensource.org/licenses/MIT  The MIT License (MIT)
  * @link      http://www.a-birkett.co.uk
  */
 
-namespace ABFramework\classes;
+namespace ABFramework\tests;
 
-use PDO;
+use PHPUnit\Framework\TestCase;
 
 /**
- * Basic wrapper for working with a MySQL database via PDO.
+ * Test the ControllerFactory correctly loads classes.
  *
- * @category  Classes
- * @package   ABFramework
+ * @category  Tests
+ * @package   PersonalWebsite
  * @author    Anthony Birkett <anthony@a-birkett.co.uk>
  * @copyright 2015 Anthony Birkett
  * @license   http://opensource.org/licenses/MIT  The MIT License (MIT)
  * @link      http://www.a-birkett.co.uk
  */
-class PDODatabaseMySQL extends PDODatabase
+class ControllerFactoryTest extends TestCase
 {
 
 
     /**
-     * Open a database handle.
+     * Load a controller using both the Autoloader and ControllerFactory.
      *
-     * @return object Database handle
+     * @covers ABFramework\classes\ControllerFactory::__construct
+     * @return none
      */
-    public static function getInstance()
+    public function testRootClassLoad()
     {
-        static $database = null;
-        if (isset($database) === false) {
-            $database = new PDODatabaseMySQL();
-        }
-
-        return $database;
-    }//end getInstance()
-
-
-    /**
-     * Constructor - set up the DSN and connect to the database.
-     *
-     * @return void
-     */
-    private function __construct()
-    {
-        // Dont actually connect to the database when running unit tests.
-        if (defined('RUNNING_PHPUNIT_TESTS') === true) {
-            return;
-        }
-
-        $user = DATABASE_USERNAME;
-        $pass = DATABASE_PASSWORD;
-        $host = DATABASE_HOSTNAME;
-        $name = DATABASE_NAME;
-        $port = DATABASE_PORT;
-
-        $dsn = 'mysql:host='.$host.';dbname='.$name.';port='.$port.';charset=utf8';
-
-        $this->connect($dsn, $user, $pass);
-    }//end __construct()
+        //Loads from /classes and /controllers.
+        $blankPage = '';
+        $controllerFactory = new \ABFramework\classes\ControllerFactory(
+            'BasePageController',
+            $blankPage
+        );
+        $this->assertNotNull($controllerFactory);
+    }//end testRootClassLoad()
 }//end class

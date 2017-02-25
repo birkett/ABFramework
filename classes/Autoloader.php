@@ -108,7 +108,8 @@ class Autoloader
                 }//end foreach
 
                 if ($found === false) {
-                    throw new \Exception('Namespace prefix for class '.$class.' not registered.');
+                    // The namespace is not registered for this autoloader.
+                    return;
                 }//end if
 
                 $relativeClass = mb_substr($class, $classLen);

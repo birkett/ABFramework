@@ -25,7 +25,7 @@
  *
  * PHP Version 5.3
  *
- * @category  Classes
+ * @category  TestSuiteConfig
  * @package   ABFramework
  * @author    Anthony Birkett <anthony@a-birkett.co.uk>
  * @copyright 2015 Anthony Birkett
@@ -33,60 +33,47 @@
  * @link      http://www.a-birkett.co.uk
  */
 
-namespace ABFramework\classes;
+namespace ABFramework\tests;
 
-use PDO;
+use ABFramework\classes\Config as FrameworkConfig;
 
 /**
- * Basic wrapper for working with a MySQL database via PDO.
+ * Defines a set of symbols, building a site configuration.
  *
- * @category  Classes
- * @package   ABFramework
+ * As well as defining symbols, the site config is used to set PHP.ini options,
+ * such as error_reporting, display_errors and date_default_timezone_set.
+ *
+ * The end goal for this file is to allow the site to move servers, and be back
+ * up and running after making basic changes here. The essential part of this
+ * is the database connection details, which if set correctly, the site should
+ * be opperational.
+ *
+ * @category  Config
+ * @package   TestSuiteConfig
  * @author    Anthony Birkett <anthony@a-birkett.co.uk>
  * @copyright 2015 Anthony Birkett
  * @license   http://opensource.org/licenses/MIT  The MIT License (MIT)
  * @link      http://www.a-birkett.co.uk
  */
-class PDODatabaseMySQL extends PDODatabase
+class TestSuiteConfig extends FrameworkConfig
 {
 
 
     /**
-     * Open a database handle.
-     *
-     * @return object Database handle
-     */
-    public static function getInstance()
-    {
-        static $database = null;
-        if (isset($database) === false) {
-            $database = new PDODatabaseMySQL();
-        }
-
-        return $database;
-    }//end getInstance()
-
-
-    /**
-     * Constructor - set up the DSN and connect to the database.
+     * Set up the environment.
      *
      * @return void
      */
-    private function __construct()
+    public function __construct()
     {
-        // Dont actually connect to the database when running unit tests.
-        if (defined('RUNNING_PHPUNIT_TESTS') === true) {
-            return;
-        }
+        define('ADMIN_FOLDER', 'admin');
 
-        $user = DATABASE_USERNAME;
-        $pass = DATABASE_PASSWORD;
-        $host = DATABASE_HOSTNAME;
-        $name = DATABASE_NAME;
-        $port = DATABASE_PORT;
+        define('DATABASE_USERNAME', 'test');
+        define('DATABASE_PASSWORD', 'test');
+        define('DATABASE_HOSTNAME', 'localhost');
+        define('DATABASE_NAME', 'test');
+        define('DATABASE_PORT', 3306);
 
-        $dsn = 'mysql:host='.$host.';dbname='.$name.';port='.$port.';charset=utf8';
-
-        $this->connect($dsn, $user, $pass);
+        parent::__construct();
     }//end __construct()
 }//end class
