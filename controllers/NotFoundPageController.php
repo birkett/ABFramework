@@ -38,7 +38,7 @@ namespace ABFramework\controllers;
 use \ABFramework\controllers\BasePageController as BasePageController;
 
 /**
- * Handles generating the 403 Forbidden page.
+ * Handles generating the 404 Not Found page.
  *
  * @category  Controllers
  * @package   ABFramework
@@ -47,7 +47,7 @@ use \ABFramework\controllers\BasePageController as BasePageController;
  * @license   http://opensource.org/licenses/MIT  The MIT License (MIT)
  * @link      http://www.a-birkett.co.uk
  */
-class 403PageController extends BasePageController
+class NotFoundPageController extends BasePageController
 {
 
 
@@ -73,7 +73,7 @@ class 403PageController extends BasePageController
     {
         parent::getHandler($output);
 
-        $this->forbiddenRequest();
+        $this->notFoundRequest();
     }//end getHandler()
 
 
