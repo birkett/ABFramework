@@ -241,4 +241,26 @@ class BasePageController
         http_response_code(400);
         echo $message;
     }//end badRequest()
+
+
+    /**
+     * Exit the script with a forbidden HTTP code.
+     *
+     * @return void
+     */
+    final protected function forbiddenRequest()
+    {
+        http_response_code(403);
+    }//end forbiddenRequest()
+
+
+    /**
+     * Exit the script with a not found HTTP code.
+     *
+     * @return void
+     */
+    final protected function notFoundRequest()
+    {
+        http_response_code(400);
+    }//end notFoundRequest()
 }//end class
